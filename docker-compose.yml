@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+    php:
+        build:
+            dockerfile: Dockerfile
+            context: .
+        container_name: php80-absen
+        volumes:
+            - ../absen:/var/www/html/absen
+        networks:
+            - attendance_network
+        environment:
+            APP_ENV: local
+            DB_HOST: mysql
+            DB_DATABASE: absen
+            DB_USERNAME: root
+            DB_PASSWORD: Tsaqif@2025
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx80
+        ports:
+            - "8007:80"
+        volumes:
+            - ../absen:/var/www/html/absen
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+        networks:
+            - attendance_network
+
+    mysql:
+        image: mysql:5.7
+        container_name: mysql57-absen
+        environment:
+            MYSQL_ROOT_PASSWORD: Tsaqif@2025
+            MYSQL_DATABASE: absen
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - attendance_network
+
+volumes:
+    mysql_data:
+
+networks:
+    attendance_network:
+        driver: bridge
